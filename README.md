@@ -1,121 +1,263 @@
-TP 2 - Backend con Node.js y Express
+# TP Final - Backend con Node.js, Express y MongoDB
 
-API REST para gestión de productos y carritos de compra desarrollada con Node.js y Express.  
-Incluye funcionalidades en **tiempo real** usando WebSockets y vistas dinámicas con Handlebars.
+##  Descripción del Proyecto
+Este es el **Trabajo Práctico Final** del curso de Backend, que implementa una API REST completa para gestionar productos y carritos de compra con persistencia en MongoDB.
 
-## Características
-- Gestión completa de productos (CRUD)
-- Gestión de carritos de compra
-- Persistencia de datos en archivos JSON
-- Validaciones de datos
-- Manejo de errores robusto
+##  Tecnologías Utilizadas
+- **Node.js** - Runtime de JavaScript
+- **Express.js** - Framework web para Node.js
+- **MongoDB** - Base de datos NoSQL
+- **Mongoose** - ODM para MongoDB
+- **Socket.IO** - WebSockets para tiempo real
+- **Handlebars** - Motor de plantillas
+- **Bootstrap** - Framework CSS
 
-## Instalación
+##  Estructura del Proyecto
+```
+ app.js                 # Servidor principal
+ package.json           # Dependencias del proyecto
+ .env                   # Variables de entorno
+ migrate.js             # Script de migración de datos
+ config/                # Configuración
+    database.js        # Conexión a MongoDB
+ models/                # Modelos de Mongoose
+    Product.js         # Modelo de productos
+    Cart.js            # Modelo de carritos
+ services/              # Lógica de negocio
+    productService.js  # Servicio de productos
+    cartService.js     # Servicio de carritos
+ routes/                # Definición de rutas
+    products.js        # Endpoints de productos
+    carts.js           # Endpoints de carritos
+    views.js           # Rutas de vistas
+ views/                 # Vistas Handlebars
+    home.handlebars
+    products.handlebars
+    productDetail.handlebars
+    cart.handlebars
+    realTimeProducts.handlebars
+    error.handlebars
+    layouts/
+ data/                  # Archivos de persistencia (legacy)
+     products.json
+     carts.json
+```
 
-1. Clonar el repositorio
-2. Instalar dependencias:
+##  Cómo Ejecutar el Proyecto
+
+### 1. Instalación de Dependencias
 ```bash
 npm install
 ```
 
-## Uso
+### 2. Configurar MongoDB
+Asegúrate de tener MongoDB ejecutándose en tu sistema:
+```bash
+# En Windows (si tienes MongoDB instalado)
+mongod
 
-### Iniciar el servidor
+# O usar MongoDB Atlas (recomendado para desarrollo)
+```
+
+### 3. Migrar Datos (Opcional)
+Si tienes datos en los archivos JSON, puedes migrarlos a MongoDB:
+```bash
+npm run migrate
+```
+
+### 4. Iniciar el Servidor
 ```bash
 npm start
 ```
 
-### Modo desarrollo (con nodemon)
+### 5. Modo Desarrollo (con recarga automática)
 ```bash
 npm run dev
 ```
 
-El servidor estará disponible en `http://localhost:8080`
+El servidor estará disponible en: **http://localhost:8080**
 
-## Endpoints de la API
+##  Endpoints de la API
 
 ### Productos (`/api/products`)
 
-#### GET `/api/products`
-Lista todos los productos
+#### GET `/api/products` - Listar productos con paginación, filtros y ordenamiento
+**Query Parameters:**
+- `limit` (opcional): Número de elementos por página (default: 10)
+- `page` (opcional): Número de página (default: 1)
+- `sort` (opcional): Ordenamiento por precio (`asc` o `desc`)
+- `query` (opcional): Filtros (`category:Electrónicos` o `status:true`)
 
-#### GET `/api/products/:pid`
-Obtiene un producto específico por ID
+**Ejemplo:**
+```
+GET /api/products?limit=5&page=2&sort=asc&query=category:Electrónicos
+```
 
-#### POST `/api/products`
-Crea un nuevo producto
-
-**Body requerido:**
+**Respuesta:**
 ```json
 {
-  "title": "Nombre del producto",
-  "description": "Descripción del producto",
-  "code": "CODIGO_UNICO",
-  "price": 99.99,
-  "stock": 100,
-  "category": "Categoría",
-  "status": true,
-  "thumbnails": ["url1.jpg", "url2.jpg"]
+  "status": "success",
+  "payload": [...],
+  "totalPages": 3,
+  "prevPage": 1,
+  "nextPage": 3,
+  "page": 2,
+  "hasPrevPage": true,
+  "hasNextPage": true,
+  "prevLink": "/api/products?limit=5&page=1&sort=asc&query=category:Electrónicos",
+  "nextLink": "/api/products?limit=5&page=3&sort=asc&query=category:Electrónicos"
 }
 ```
 
-#### PUT `/api/products/:pid`
-Actualiza un producto existente
-
-#### DELETE `/api/products/:pid`
-Elimina un producto
+#### Otros endpoints de productos:
+- **GET** `/api/products/:pid` - Obtener producto por ID
+- **POST** `/api/products` - Crear nuevo producto
+- **PUT** `/api/products/:pid` - Actualizar producto
+- **DELETE** `/api/products/:pid` - Eliminar producto
 
 ### Carritos (`/api/carts`)
 
-#### POST `/api/carts`
-Crea un nuevo carrito
+#### Endpoints disponibles:
+- **POST** `/api/carts` - Crear nuevo carrito
+- **GET** `/api/carts/:cid` - Ver productos del carrito (con populate)
+- **POST** `/api/carts/:cid/product/:pid` - Agregar producto al carrito
+- **DELETE** `/api/carts/:cid/products/:pid` - Eliminar producto del carrito
+- **PUT** `/api/carts/:cid` - Actualizar todos los productos del carrito
+- **PUT** `/api/carts/:cid/products/:pid` - Actualizar cantidad de un producto
+- **DELETE** `/api/carts/:cid` - Eliminar todos los productos del carrito
 
-#### GET `/api/carts/:cid`
-Obtiene los productos de un carrito específico
+##  Vistas Disponibles
 
-#### POST `/api/carts/:cid/product/:pid`
-Agrega un producto al carrito
+### Vistas principales:
+- **GET** `/` - Página de inicio con todos los productos
+- **GET** `/products` - Lista de productos con paginación y filtros
+- **GET** `/products/:pid` - Detalle de producto individual
+- **GET** `/carts/:cid` - Vista de carrito específico
+- **GET** `/realtimeproducts` - Productos en tiempo real con WebSockets
 
-**Body opcional:**
+##  Ejemplos de Uso
+
+### Crear un Producto
 ```json
+POST /api/products
+{
+  "title": "Laptop Gaming",
+  "description": "Laptop de alto rendimiento para gaming",
+  "code": "LAP001",
+  "price": 1299.99,
+  "stock": 50,
+  "category": "Electrónicos",
+  "status": true,
+  "thumbnails": ["laptop1.jpg"]
+}
+```
+
+### Crear un Carrito
+```json
+POST /api/carts
+```
+
+### Agregar Producto al Carrito
+```json
+POST /api/carts/507f1f77bcf86cd799439011/product/507f1f77bcf86cd799439012
 {
   "quantity": 2
 }
 ```
 
-## Estructura del Proyecto
-
-```
-├── app.js                 # Archivo principal del servidor
-├── package.json           # Dependencias del proyecto
-├── routes/                # Rutas de la API
-│   ├── products.js       # Rutas de productos
-│   └── carts.js          # Rutas de carritos
-├── managers/              # Lógica de negocio
-│   ├── ProductManager.js # Gestión de productos
-│   └── CartManager.js    # Gestión de carritos
-└── data/                  # Archivos de persistencia
-    ├── products.json     # Base de datos de productos
-    └── carts.json        # Base de datos de carritos
+### Actualizar Cantidad en el Carrito
+```json
+PUT /api/carts/507f1f77bcf86cd799439011/products/507f1f77bcf86cd799439012
+{
+  "quantity": 5
+}
 ```
 
-## Validaciones
+##  Funcionalidades Implementadas
 
-- Los IDs se autogeneran y nunca se repiten
-- El código de producto debe ser único
-- El precio debe ser un número mayor a 0
-- El stock debe ser un número mayor o igual a 0
-- Se valida la existencia de productos y carritos antes de operaciones
+### Productos
+-  CRUD completo de productos
+-  Paginación con información completa
+-  Filtros por categoría y disponibilidad
+-  Ordenamiento ascendente/descendente por precio
+-  Validaciones de datos
+-  IDs únicos con MongoDB ObjectId
+-  Índices para optimización de consultas
 
-## Tecnologías Utilizadas
+### Carritos
+-  CRUD completo de carritos
+-  Agregar/eliminar productos del carrito
+-  Actualizar cantidades
+-  Populate de productos para obtener datos completos
+-  Validaciones de stock y disponibilidad
+-  Limpiar carrito completo
 
-- Node.js
-- Express.js
-- Sistema de archivos para persistencia
-- Async/Await para operaciones asíncronas
+### Vistas
+-  Paginación funcional en vista de productos
+-  Filtros y ordenamiento en la interfaz
+-  Vista de detalle de producto
+-  Vista de carrito con funcionalidad completa
+-  Agregar productos al carrito desde las vistas
+-  Diseño responsive con Bootstrap
 
-## Autor
-Desarrollado para el curso de Backend 
+### Tiempo Real
+-  WebSockets para actualizaciones en tiempo real
+-  Crear y eliminar productos en tiempo real
+-  Sincronización automática entre clientes
 
+##  Características Técnicas
 
+- **Persistencia**: MongoDB con Mongoose ODM
+- **Validaciones**: Esquemas de Mongoose con validaciones
+- **Manejo de errores**: Middleware de errores robusto
+- **Arquitectura**: Separación clara de responsabilidades
+- **Async/Await**: Manejo moderno de operaciones asíncronas
+- **Índices**: Optimización de consultas con índices de MongoDB
+- **Populate**: Referencias entre colecciones con populate
 
+##  Estado del Proyecto
+-  **Completado**: Todas las funcionalidades requeridas
+-  **Probado**: API funcionando correctamente
+-  **Documentado**: README y comentarios completos
+-  **Optimizado**: Servicios y modelos bien estructurados
+-  **Migrado**: De archivos JSON a MongoDB
+
+##  Funcionalidades del TP Final
+
+###  Paginación Profesional
+- Implementada en GET `/api/products` con todos los parámetros requeridos
+- Respuesta incluye información completa de paginación
+- Links de navegación automáticos
+
+###  Filtros y Ordenamiento
+- Filtros por categoría y disponibilidad
+- Ordenamiento ascendente/descendente por precio
+- Query parameters bien estructurados
+
+###  Endpoints de Carrito Completos
+- DELETE `/api/carts/:cid/products/:pid` - Eliminar producto
+- PUT `/api/carts/:cid` - Actualizar todos los productos
+- PUT `/api/carts/:cid/products/:pid` - Actualizar cantidad
+- DELETE `/api/carts/:cid` - Limpiar carrito
+
+###  Populate en Carritos
+- Referencias a productos con ObjectId
+- Populate automático para obtener datos completos
+- Estructura de datos optimizada
+
+###  Vistas con Paginación
+- Vista `/products` con paginación funcional
+- Vista `/products/:pid` para detalles
+- Vista `/carts/:cid` para carritos específicos
+- Botones de agregar al carrito funcionales
+
+##  Soporte
+Si tienes alguna pregunta o problema:
+1. Revisa la documentación en este README
+2. Verifica que MongoDB esté ejecutándose
+3. Ejecuta `npm run migrate` si necesitas datos de ejemplo
+4. Revisa los logs del servidor para errores
+
+---
+
+**¡El proyecto está listo para entregar! **
