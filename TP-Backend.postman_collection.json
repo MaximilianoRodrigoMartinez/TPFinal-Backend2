@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "tp-backend-collection",
 		"name": "TP Backend - Tests Completos",
-		"description": "Colección completa de tests para el TP de Backend. Incluye casos normales y casos edge, especialmente para eliminación.",
+		"description": "Colección completa de tests para el TP de Backend. Incluye casos normales y casos edge, especialmente para eliminación. También incluye tests para el sistema de autenticación con JWT y Passport.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -1085,6 +1085,547 @@
 				}
 			],
 			"description": "Tests para endpoints de carritos"
+		},
+		{
+			"name": "Sesiones",
+			"item": [
+				{
+					"name": "1. Registrar usuario",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Intentar parsear el body actual",
+									"var currentBody = pm.request.body.raw;",
+									"var requestBody;",
+									"",
+									"try {",
+									"    requestBody = JSON.parse(currentBody);",
+									"} catch (e) {",
+									"    requestBody = {};",
+									"}",
+									"",
+									"// Solo generar email único si el usuario no ha especificado uno",
+									"// o si está usando el valor por defecto",
+									"if (!requestBody.email || requestBody.email === \"test@example.com\") {",
+									"    // Generar email único solo para evitar conflictos en tests automatizados",
+									"    // Si quieres usar un email específico, edítalo en el body antes de ejecutar",
+									"    var uniqueEmail = \"test\" + Date.now() + \"@example.com\";",
+									"    requestBody.email = uniqueEmail;",
+									"}",
+									"",
+									"// Asegurar que los otros campos tengan valores por defecto si no están",
+									"if (!requestBody.first_name) requestBody.first_name = \"Juan\";",
+									"if (!requestBody.last_name) requestBody.last_name = \"Pérez\";",
+									"if (!requestBody.age) requestBody.age = 25;",
+									"if (!requestBody.password) requestBody.password = \"password123\";",
+									"",
+									"// Actualizar el body de la request",
+									"pm.request.body.raw = JSON.stringify(requestBody, null, 2);"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"User registered successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.payload).to.have.property('_id');",
+									"    pm.expect(jsonData.payload).to.have.property('email');",
+									"    pm.expect(jsonData.payload).to.not.have.property('password');",
+									"    ",
+									"    // Guardar el email para usar en login",
+									"    pm.environment.set(\"testUserEmail\", jsonData.payload.email);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Juan\",\n    \"last_name\": \"Pérez\",\n    \"email\": \"test@example.com\",\n    \"age\": 25,\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/sessions/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"register"
+							]
+						},
+						"description": "Registra un nuevo usuario. Puedes editar el body para usar cualquier email (ej: pepito@hotmail.com). Si dejas el email por defecto, se generará uno único automáticamente para evitar conflictos en tests."
+					},
+					"response": []
+				},
+				{
+					"name": "1.1. Registrar usuario con campos faltantes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Response has error message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"error\");",
+									"    pm.expect(jsonData.error).to.include(\"requeridos\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Juan\",\n    \"email\": \"test@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/sessions/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"register"
+							]
+						},
+						"description": "Test para registro con campos faltantes"
+					},
+					"response": []
+				},
+				{
+					"name": "1.2. Registrar usuario con contraseña corta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Response has error about password length\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"error\");",
+									"    pm.expect(jsonData.error).to.include(\"contraseña\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Juan\",\n    \"last_name\": \"Pérez\",\n    \"email\": \"test2@example.com\",\n    \"age\": 25,\n    \"password\": \"12345\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/sessions/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"register"
+							]
+						},
+						"description": "Test para contraseña con menos de 6 caracteres"
+					},
+					"response": []
+				},
+				{
+					"name": "2. Login de usuario",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Intentar parsear el body actual",
+									"var currentBody = pm.request.body.raw;",
+									"var requestBody;",
+									"",
+									"try {",
+									"    requestBody = JSON.parse(currentBody);",
+									"} catch (e) {",
+									"    requestBody = {};",
+									"}",
+									"",
+									"// Solo actualizar el email si no está definido o es la variable {{testUserEmail}}",
+									"if (!requestBody.email || requestBody.email === \"{{testUserEmail}}\") {",
+									"    // Usar el email guardado del registro, o un email por defecto",
+									"    var userEmail = pm.environment.get(\"testUserEmail\");",
+									"    if (!userEmail) {",
+									"        // Si no hay email guardado, usar uno por defecto",
+									"        userEmail = \"test@example.com\";",
+									"    }",
+									"    requestBody.email = userEmail;",
+									"}",
+									"",
+									"// Asegurar que la contraseña esté presente",
+									"if (!requestBody.password) {",
+									"    requestBody.password = \"password123\";",
+									"}",
+									"",
+									"// Actualizar el body de la request",
+									"pm.request.body.raw = JSON.stringify(requestBody, null, 2);"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Login successful\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.payload).to.have.property('token');",
+									"    pm.expect(jsonData.payload).to.have.property('user');",
+									"    ",
+									"    // Guardar el token para usar en otros tests",
+									"    pm.environment.set(\"authToken\", jsonData.payload.token);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/sessions/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"login"
+							]
+						},
+						"description": "Inicia sesión y obtiene token JWT. Si ejecutaste el test de registro antes, usará ese email automáticamente. Si no, usa test@example.com por defecto (puedes editarlo en el body)."
+					},
+					"response": []
+				},
+				{
+					"name": "2.1. Login con credenciales inválidas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Response has error message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"error\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"noexiste@example.com\",\n    \"password\": \"wrongpassword\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/sessions/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"login"
+							]
+						},
+						"description": "Test para login con credenciales incorrectas"
+					},
+					"response": []
+				},
+				{
+					"name": "2.2. Login con campos faltantes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Response has error message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"error\");",
+									"    pm.expect(jsonData.error).to.include(\"requeridos\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/sessions/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"login"
+							]
+						},
+						"description": "Test para login sin contraseña"
+					},
+					"response": []
+				},
+				{
+					"name": "3. Obtener usuario actual (current)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User data retrieved successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.payload).to.have.property('_id');",
+									"    pm.expect(jsonData.payload).to.have.property('email');",
+									"    pm.expect(jsonData.payload).to.not.have.property('password');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/sessions/current",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"current"
+							]
+						},
+						"description": "Obtiene los datos del usuario autenticado usando el token JWT"
+					},
+					"response": []
+				},
+				{
+					"name": "3.1. Obtener usuario actual sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Response has error message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"error\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/sessions/current",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"current"
+							]
+						},
+						"description": "Test para obtener usuario sin token de autenticación"
+					},
+					"response": []
+				},
+				{
+					"name": "3.2. Obtener usuario actual con token inválido",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Response has error message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"error\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer token_invalido_12345",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/sessions/current",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"current"
+							]
+						},
+						"description": "Test para obtener usuario con token JWT inválido"
+					},
+					"response": []
+				},
+				{
+					"name": "4. Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Logout successful\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.message).to.include(\"Logout\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/sessions/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"logout"
+							]
+						},
+						"description": "Cierra sesión y limpia la cookie JWT"
+					},
+					"response": []
+				}
+			],
+			"description": "Tests para endpoints de autenticación y sesiones"
 		}
 	],
 	"event": [

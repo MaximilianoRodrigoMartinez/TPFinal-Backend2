@@ -10,6 +10,10 @@ const connectDB = require("./config/database");
 const viewsRouter = require("./routes/views");
 const productsRouter = require("./routes/products");
 const cartsRouter = require("./routes/carts");
+const sessionsRouter = require("./routes/sessions");
+
+// Configurar Passport
+require("./config/passport.config");
 
 // Importar servicios
 const productService = require("./services/productService");
@@ -59,6 +63,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/", viewsRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
+app.use("/api/sessions", sessionsRouter);
 
 // Middleware para manejar rutas no encontradas
 app.use("*", (req, res) => {
