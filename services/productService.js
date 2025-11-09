@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const mongoose = require("mongoose");
 
 class ProductService {
   async getProducts(options = {}) {
@@ -83,7 +84,12 @@ class ProductService {
 
   async getProductById(id) {
     try {
-      const product = await Product.findById(id);
+      // Validar que el ID sea un ObjectId válido
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error("ID de producto inválido");
+      }
+      
+      const product = await Product.findById(id).lean();
       if (!product) {
         throw new Error("Producto no encontrado");
       }
@@ -108,6 +114,11 @@ class ProductService {
 
   async updateProduct(id, updateData) {
     try {
+      // Validar que el ID sea un ObjectId válido
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error("ID de producto inválido");
+      }
+      
       const product = await Product.findByIdAndUpdate(
         id,
         updateData,
@@ -129,6 +140,11 @@ class ProductService {
 
   async deleteProduct(id) {
     try {
+      // Validar que el ID sea un ObjectId válido
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error("ID de producto inválido");
+      }
+      
       const product = await Product.findByIdAndDelete(id);
       if (!product) {
         throw new Error("Producto no encontrado");
@@ -136,6 +152,15 @@ class ProductService {
       return product;
     } catch (error) {
       throw new Error(`Error eliminando producto: ${error.message}`);
+    }
+  }
+
+  async getCategories() {
+    try {
+      const categories = await Product.distinct("category");
+      return categories.sort();
+    } catch (error) {
+      throw new Error(`Error obteniendo categorías: ${error.message}`);
     }
   }
 }

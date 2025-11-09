@@ -1,59 +1,205 @@
-<h1>Productos en Tiempo Real</h1>
-
-<form id="productForm">
-    <input type="text" id="title" placeholder="Título" required>
-    <input type="text" id="code" placeholder="Código" required>
-    <input type="number" id="price" placeholder="Precio" required>
-    <input type="number" id="stock" placeholder="Stock" required>
-    <input type="text" id="category" placeholder="Categoría" required>
-    <button type="submit">Agregar Producto</button>
-</form>
-
-<div id="productsList">
-    {{#each products}}
-    <div>
-        <h3>{{title}}</h3>
-        <p>{{description}}</p>
-        <p>Precio: ${{price}}</p>
-        <p>Stock: {{stock}}</p>
-        <button onclick="deleteProduct({{id}})">Eliminar</button>
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-plus-circle"></i> Crear Nuevo Producto
+        </h1>
+        
+        <!-- Formulario de creación -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit"></i> Información del Producto
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="productForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="title" class="form-label">
+                                <i class="fas fa-tag"></i> Título <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="title" placeholder="Ej: Laptop Gaming" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="code" class="form-label">
+                                <i class="fas fa-barcode"></i> Código <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="code" placeholder="Ej: LAP001" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-align-left"></i> Descripción
+                        </label>
+                        <textarea class="form-control" id="description" rows="3" placeholder="Descripción del producto"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="price" class="form-label">
+                                <i class="fas fa-dollar-sign"></i> Precio <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" class="form-control" id="price" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="stock" class="form-label">
+                                <i class="fas fa-boxes"></i> Stock <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" class="form-control" id="stock" placeholder="0" min="0" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="category" class="form-label">
+                                <i class="fas fa-folder"></i> Categoría <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="category" placeholder="Ej: Electrónicos" required>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus"></i> Crear Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Lista de productos -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-list"></i> Productos Existentes
+                </h5>
+                <span class="badge bg-light text-dark" id="productCount">{{products.length}} productos</span>
+            </div>
+            <div class="card-body">
+                <div id="productsList">
+                    {{#if products.length}}
+                        <div class="row">
+                            {{#each products}}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100 border">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{title}}</h6>
+                                        <p class="card-text text-muted small mb-2">{{description}}</p>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-primary">{{category}}</span>
+                                            <span class="text-success fw-bold">${{price}}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">Stock: {{stock}}</small>
+                                            <button class="btn btn-danger btn-sm" onclick="deleteProduct('{{_id}}')">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
+                    {{else}}
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle"></i> No hay productos. Crea uno usando el formulario de arriba.
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
     </div>
-    {{/each}}
 </div>
 
-<script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
 
+// Manejar envío del formulario
 document.getElementById("productForm").addEventListener("submit", (e) => {
     e.preventDefault();
+    
     const productData = {
-        title: document.getElementById("title").value,
-        code: document.getElementById("code").value,
+        title: document.getElementById("title").value.trim(),
+        code: document.getElementById("code").value.trim(),
         price: parseFloat(document.getElementById("price").value),
         stock: parseInt(document.getElementById("stock").value),
-        category: document.getElementById("category").value,
-        description: "Descripción básica",
+        category: document.getElementById("category").value.trim(),
+        description: document.getElementById("description").value.trim() || "Sin descripción",
         status: true
     };
+    
+    // Validación básica
+    if (!productData.title || !productData.code || !productData.price || !productData.category) {
+        alert("Por favor completa todos los campos requeridos");
+        return;
+    }
+    
     socket.emit("createProduct", productData);
     e.target.reset();
+    
+    // Mostrar mensaje de éxito
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-check"></i> ¡Producto Creado!';
+    submitBtn.classList.add('btn-success');
+    submitBtn.classList.remove('btn-primary');
+    
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.classList.remove('btn-success');
+        submitBtn.classList.add('btn-primary');
+    }, 2000);
 });
 
+// Función para eliminar producto
 function deleteProduct(id) {
-    socket.emit("deleteProduct", id);
+    if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+        socket.emit("deleteProduct", id);
+    }
 }
 
+// Actualizar lista cuando hay cambios
 socket.on("productsUpdated", (products) => {
     const container = document.getElementById("productsList");
-    container.innerHTML = products.map(product => `
-        <div>
-            <h3>${product.title}</h3>
-            <p>${product.description}</p>
-            <p>Precio: $${product.price}</p>
-            <p>Stock: ${product.stock}</p>
-            <button onclick="deleteProduct(${product.id})">Eliminar</button>
-        </div>
-    `).join("");
+    const countBadge = document.getElementById("productCount");
+    
+    // Actualizar contador
+    countBadge.textContent = `${products.length} productos`;
+    
+    if (products.length === 0) {
+        container.innerHTML = `
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle"></i> No hay productos. Crea uno usando el formulario de arriba.
+            </div>
+        `;
+    } else {
+        container.innerHTML = `
+            <div class="row">
+                ${products.map(product => `
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100 border">
+                            <div class="card-body">
+                                <h6 class="card-title">${product.title || 'Sin título'}</h6>
+                                <p class="card-text text-muted small mb-2">${product.description || 'Sin descripción'}</p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-primary">${product.category || 'Sin categoría'}</span>
+                                    <span class="text-success fw-bold">$${product.price || 0}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Stock: ${product.stock || 0}</small>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product._id}')">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join("")}
+            </div>
+        `;
+    }
+});
+
+// Manejar errores
+socket.on("error", (error) => {
+    alert("Error: " + error.message);
 });
 </script>

@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /products - Vista de productos con paginación
+// GET /products - Vista de productos con paginaciï¿½n
 router.get("/products", async (req, res) => {
   try {
     const { limit, page, sort, query } = req.query;
@@ -49,10 +49,21 @@ router.get("/products", async (req, res) => {
     }
 
     const result = await productService.getProducts(options);
+    const categories = await productService.getCategories();
+    
+    // Extraer la categorÃ­a seleccionada para la comparaciÃ³n
+    let selectedCategory = "";
+    if (query && query.startsWith("category:")) {
+      selectedCategory = query.split(":")[1];
+    }
     
     res.render("products", {
       title: "Productos",
-      ...result
+      ...result,
+      query: query || "",
+      sort: sort || "",
+      categories: categories,
+      selectedCategory: selectedCategory
     });
   } catch (error) {
     console.error("Error obteniendo productos:", error);
@@ -82,7 +93,7 @@ router.get("/products/:pid", async (req, res) => {
   }
 });
 
-// GET /carts/:cid - Vista de carrito específico
+// GET /carts/:cid - Vista de carrito especï¿½fico
 router.get("/carts/:cid", async (req, res) => {
   try {
     const { cid } = req.params;

@@ -1,5 +1,6 @@
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
+const mongoose = require('mongoose');
 
 class CartService {
   async createCart() {
@@ -14,7 +15,12 @@ class CartService {
 
   async getCartById(id) {
     try {
-      const cart = await Cart.findById(id).populate('products.product');
+      // Validar que el ID sea un ObjectId válido
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error('ID de carrito inválido');
+      }
+      
+      const cart = await Cart.findById(id).populate('products.product').lean();
       if (!cart) {
         throw new Error('Carrito no encontrado');
       }
@@ -26,6 +32,14 @@ class CartService {
 
   async addProductToCart(cartId, productId, quantity = 1) {
     try {
+      // Validar que los IDs sean ObjectId válidos
+      if (!mongoose.Types.ObjectId.isValid(cartId)) {
+        throw new Error('ID de carrito inválido');
+      }
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
+        throw new Error('ID de producto inválido');
+      }
+      
       const cart = await Cart.findById(cartId);
       if (!cart) {
         throw new Error('Carrito no encontrado');
@@ -63,6 +77,14 @@ class CartService {
 
   async removeProductFromCart(cartId, productId) {
     try {
+      // Validar que los IDs sean ObjectId válidos
+      if (!mongoose.Types.ObjectId.isValid(cartId)) {
+        throw new Error('ID de carrito inválido');
+      }
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
+        throw new Error('ID de producto inválido');
+      }
+      
       const cart = await Cart.findById(cartId);
       if (!cart) {
         throw new Error('Carrito no encontrado');
@@ -81,12 +103,20 @@ class CartService {
 
   async updateCartProducts(cartId, products) {
     try {
+      // Validar que el ID sea un ObjectId válido
+      if (!mongoose.Types.ObjectId.isValid(cartId)) {
+        throw new Error('ID de carrito inválido');
+      }
+      
       const cart = await Cart.findById(cartId);
       if (!cart) {
         throw new Error('Carrito no encontrado');
       }
 
       for (const item of products) {
+        if (!mongoose.Types.ObjectId.isValid(item.product)) {
+          throw new Error('ID de producto inválido: ' + item.product);
+        }
         const product = await Product.findById(item.product);
         if (!product) {
           throw new Error('Producto ' + item.product + ' no encontrado');
@@ -103,6 +133,14 @@ class CartService {
 
   async updateProductQuantity(cartId, productId, quantity) {
     try {
+      // Validar que los IDs sean ObjectId válidos
+      if (!mongoose.Types.ObjectId.isValid(cartId)) {
+        throw new Error('ID de carrito inválido');
+      }
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
+        throw new Error('ID de producto inválido');
+      }
+      
       const cart = await Cart.findById(cartId);
       if (!cart) {
         throw new Error('Carrito no encontrado');
@@ -131,6 +169,11 @@ class CartService {
 
   async clearCart(cartId) {
     try {
+      // Validar que el ID sea un ObjectId válido
+      if (!mongoose.Types.ObjectId.isValid(cartId)) {
+        throw new Error('ID de carrito inválido');
+      }
+      
       const cart = await Cart.findById(cartId);
       if (!cart) {
         throw new Error('Carrito no encontrado');

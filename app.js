@@ -24,7 +24,7 @@ connectDB();
 
 // Configurar Handlebars
 app.engine("handlebars", exphbs.engine({
-  defaultLayout: false,
+  defaultLayout: "main",
   helpers: {
     formatDate: function(date) {
       return new Date(date).toLocaleDateString("es-ES");
@@ -36,6 +36,12 @@ app.engine("handlebars", exphbs.engine({
       return products.reduce((total, item) => {
         return total + (item.product.price * item.quantity);
       }, 0).toFixed(2);
+    },
+    eq: function(a, b) {
+      return a === b;
+    },
+    concat: function(...args) {
+      return args.slice(0, -1).join('');
     }
   }
 }));

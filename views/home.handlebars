@@ -1,83 +1,37 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}} - TP Backend</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-store"></i> TP Backend
-            </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/">
-                    <i class="fas fa-home"></i> Inicio
-                </a>
-                <a class="nav-link" href="/realtimeproducts">
-                    <i class="fas fa-bolt"></i> Tiempo Real
-                </a>
-            </div>
-        </div>
-    </nav>
-
-    <main class="container mt-4">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="mb-4">
-                    <i class="fas fa-boxes"></i> Lista de Productos
-                </h1>
-                
-                {{#if products.length}}
-                    <div class="row">
-                        {{#each products}}
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{title}}</h5>
-                                    <p class="card-text">{{description}}</p>
-                                    <div class="mb-2">
-                                        <span class="badge bg-primary">{{category}}</span>
-                                        <span class="badge bg-success">Stock: {{stock}}</span>
-                                    </div>
-                                    <p class="card-text">
-                                        <strong>Precio: ${{price}}</strong>
-                                    </p>
-                                    <p class="card-text">
-                                        <small class="text-muted">Código: {{code}}</small>
-                                    </p>
-                                </div>
-                                <div class="card-footer">
-                                    <small class="text-muted">
-                                        Status: {{#if status}}
-                                            <span class="text-success">Activo</span>
-                                        {{else}}
-                                            <span class="text-danger">Inactivo</span>
-                                        {{/if}}
-                                    </small>
-                                </div>
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-boxes"></i> Productos Disponibles
+        </h1>
+        
+        {{#if products.length}}
+            <div class="row">
+                {{#each products}}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{title}}</h5>
+                            <p class="card-text text-muted">{{description}}</p>
+                            <div class="mb-2">
+                                <span class="badge bg-primary">{{category}}</span>
                             </div>
+                            <p class="card-text">
+                                <strong class="text-success fs-5">${{price}}</strong>
+                            </p>
                         </div>
-                        {{/each}}
+                        <div class="card-footer bg-transparent">
+                            <a href="/products/{{_id}}" class="btn btn-primary w-100">
+                                <i class="fas fa-eye"></i> Ver Detalles
+                            </a>
+                        </div>
                     </div>
-                {{else}}
-                    <div class="alert alert-info" role="alert">
-                        <i class="fas fa-info-circle"></i> No hay productos disponibles.
-                    </div>
-                {{/if}}
+                </div>
+                {{/each}}
             </div>
-        </div>
-    </main>
-
-    <footer class="bg-dark text-light text-center py-3 mt-5">
-        <div class="container">
-            <p>&copy; 2024 TP Backend - Node.js & Express</p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        {{else}}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle"></i> No hay productos disponibles.
+            </div>
+        {{/if}}
+    </div>
+</div>
