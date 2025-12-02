@@ -15,46 +15,7 @@ class TicketDAO {
     }
   }
 
-  async findByCode(code) {
-    try {
-      if (!code) {
-        return null;
-      }
-      const ticket = await Ticket.findOne({ code: code.toUpperCase() });
-      return ticket;
-    } catch (error) {
-      throw new Error(`Error obteniendo ticket por código: ${error.message}`);
-    }
-  }
-
-  async findById(id) {
-    try {
-      if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new Error("ID de ticket inválido");
-      }
-      const ticket = await Ticket.findById(id).lean();
-      return ticket;
-    } catch (error) {
-      throw new Error(`Error obteniendo ticket por ID: ${error.message}`);
-    }
-  }
-
-  async findByPurchaser(purchaserEmail) {
-    try {
-      if (!purchaserEmail) {
-        return [];
-      }
-      const normalizedEmail = purchaserEmail.toLowerCase().trim();
-      const tickets = await Ticket.find({ purchaser: normalizedEmail })
-        .sort({ purchase_datetime: -1 })
-        .lean();
-      return tickets;
-    } catch (error) {
-      throw new Error(`Error obteniendo tickets por comprador: ${error.message}`);
-    }
-  }
-
-  async findAll(options = {}) {
+  async get(options = {}) {
     try {
       const { limit, page } = options;
       const skip = limit && page ? (page - 1) * limit : 0;
@@ -78,6 +39,51 @@ class TicketDAO {
       };
     } catch (error) {
       throw new Error(`Error obteniendo tickets: ${error.message}`);
+    }
+  }
+
+  async getById(id) {
+    try {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error("ID de ticket inválido");
+      }
+      const ticket = await Ticket.findById(id).lean();
+      return ticket;
+    } catch (error) {
+      throw new Error(`Error obteniendo ticket por ID: ${error.message}`);
+    }
+  }
+
+  async update(id, updateData) {
+    try {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error("ID de ticket inválido");
+      }
+      const ticket = await Ticket.findByIdAndUpdate(id, updateData, {
+        new: true,
+        runValidators: true,
+      }).lean();
+      if (!ticket) {
+        throw new Error("Ticket no encontrado");
+      }
+      return ticket;
+    } catch (error) {
+      throw new Error(`Error actualizando ticket: ${error.message}`);
+    }
+  }
+
+  async delete(id) {
+    try {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error("ID de ticket inválido");
+      }
+      const ticket = await Ticket.findByIdAndDelete(id).lean();
+      if (!ticket) {
+        throw new Error("Ticket no encontrado");
+      }
+      return ticket;
+    } catch (error) {
+      throw new Error(`Error eliminando ticket: ${error.message}`);
     }
   }
 }

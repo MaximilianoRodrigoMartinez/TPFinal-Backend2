@@ -1,4 +1,5 @@
 const ticketDAO = require("../dao/TicketDAO");
+const Ticket = require("../models/Ticket");
 
 class TicketRepository {
   async createTicket(ticketData) {
@@ -24,7 +25,8 @@ class TicketRepository {
 
   async getTicketByCode(code) {
     try {
-      return await ticketDAO.findByCode(code);
+      const ticket = await Ticket.findOne({ code: code.toUpperCase() });
+      return ticket;
     } catch (error) {
       throw error;
     }
@@ -32,7 +34,7 @@ class TicketRepository {
 
   async getTicketById(id) {
     try {
-      const ticket = await ticketDAO.findById(id);
+      const ticket = await ticketDAO.getById(id);
       if (!ticket) {
         throw new Error("Ticket no encontrado");
       }
@@ -47,7 +49,11 @@ class TicketRepository {
       if (!purchaserEmail) {
         throw new Error("El email del comprador es requerido");
       }
-      return await ticketDAO.findByPurchaser(purchaserEmail);
+      const normalizedEmail = purchaserEmail.toLowerCase().trim();
+      const tickets = await Ticket.find({ purchaser: normalizedEmail })
+        .sort({ purchase_datetime: -1 })
+        .lean();
+      return tickets;
     } catch (error) {
       throw error;
     }
@@ -55,7 +61,7 @@ class TicketRepository {
 
   async getAllTickets(options = {}) {
     try {
-      return await ticketDAO.findAll(options);
+      return await ticketDAO.get(options);
     } catch (error) {
       throw error;
     }

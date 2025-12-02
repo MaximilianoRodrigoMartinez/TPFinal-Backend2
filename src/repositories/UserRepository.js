@@ -1,13 +1,14 @@
 const userDAO = require("../dao/UserDAO");
 const Cart = require("../models/Cart");
+const User = require("../models/User");
 
 class UserRepository {
   async createUser(userData) {
     try {
       const normalizedEmail = userData.email ? userData.email.toLowerCase().trim() : null;
 
-      const emailExists = await userDAO.emailExists(normalizedEmail);
-      if (emailExists) {
+      const existingUser = await User.findOne({ email: normalizedEmail });
+      if (existingUser) {
         throw new Error("El email ya está registrado");
       }
 
@@ -30,7 +31,9 @@ class UserRepository {
 
   async getUserByEmail(email) {
     try {
-      return await userDAO.findByEmail(email);
+      const normalizedEmail = email ? email.toLowerCase().trim() : null;
+      const user = await User.findOne({ email: normalizedEmail });
+      return user;
     } catch (error) {
       throw error;
     }
@@ -38,7 +41,7 @@ class UserRepository {
 
   async getUserById(id) {
     try {
-      const user = await userDAO.findById(id);
+      const user = await userDAO.getById(id);
       if (!user) {
         throw new Error("Usuario no encontrado");
       }
@@ -54,7 +57,7 @@ class UserRepository {
         throw new Error("Email y contraseña son requeridos");
       }
 
-      const user = await userDAO.findByEmail(email);
+      const user = await this.getUserByEmail(email);
       if (!user) {
         throw new Error("Credenciales inválidas");
       }

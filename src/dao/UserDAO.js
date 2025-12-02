@@ -1,5 +1,4 @@
 const User = require("../models/User");
-const Cart = require("../models/Cart");
 const mongoose = require("mongoose");
 
 class UserDAO {
@@ -16,20 +15,34 @@ class UserDAO {
     }
   }
 
-  async findByEmail(email) {
+  async get(options = {}) {
     try {
-      if (!email) {
-        return null;
+      const { limit, page } = options;
+      const skip = limit && page ? (page - 1) * limit : 0;
+      const limitValue = limit ? parseInt(limit) : null;
+
+      const query = User.find().select("-password").sort({ createdAt: -1 });
+
+      if (limitValue) {
+        query.skip(skip).limit(limitValue);
       }
-      const normalizedEmail = email.toLowerCase().trim();
-      const user = await User.findOne({ email: normalizedEmail });
-      return user;
+
+      const users = await query.lean();
+      const total = await User.countDocuments();
+
+      return {
+        users,
+        total,
+        page: page || 1,
+        limit: limitValue || total,
+        totalPages: limitValue ? Math.ceil(total / limitValue) : 1,
+      };
     } catch (error) {
-      throw new Error(`Error obteniendo usuario por email: ${error.message}`);
+      throw new Error(`Error obteniendo usuarios: ${error.message}`);
     }
   }
 
-  async findById(id) {
+  async getById(id) {
     try {
       if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new Error("ID de usuario inválido");
@@ -41,25 +54,41 @@ class UserDAO {
     }
   }
 
-  async findByIdWithPassword(id) {
+  async update(id, updateData) {
     try {
       if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new Error("ID de usuario inválido");
       }
-      const user = await User.findById(id);
+      const user = await User.findByIdAndUpdate(id, updateData, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password")
+        .lean();
+      if (!user) {
+        throw new Error("Usuario no encontrado");
+      }
       return user;
     } catch (error) {
-      throw new Error(`Error obteniendo usuario por ID: ${error.message}`);
+      if (error.code === 11000) {
+        throw new Error("El email ya está registrado");
+      }
+      throw new Error(`Error actualizando usuario: ${error.message}`);
     }
   }
 
-  async emailExists(email) {
+  async delete(id) {
     try {
-      const normalizedEmail = email.toLowerCase().trim();
-      const user = await User.findOne({ email: normalizedEmail });
-      return !!user;
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Error("ID de usuario inválido");
+      }
+      const user = await User.findByIdAndDelete(id).select("-password").lean();
+      if (!user) {
+        throw new Error("Usuario no encontrado");
+      }
+      return user;
     } catch (error) {
-      throw new Error(`Error verificando email: ${error.message}`);
+      throw new Error(`Error eliminando usuario: ${error.message}`);
     }
   }
 }
