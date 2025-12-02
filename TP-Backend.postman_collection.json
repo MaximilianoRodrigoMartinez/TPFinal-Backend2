@@ -1082,6 +1082,65 @@
 						"description": "Test para vaciar carrito con ID válido pero inexistente"
 					},
 					"response": []
+				},
+				{
+					"name": "8. Finalizar compra (Purchase) - Generar Ticket",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 or 400\", function () {",
+									"    pm.expect([201, 400]).to.include(pm.response.code);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    pm.test(\"Purchase successful with ticket\", function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData.status).to.eql(\"success\");",
+									"        pm.expect(jsonData.payload.ticket).to.not.be.null;",
+									"        pm.expect(jsonData.payload.ticket.code).to.be.a('string');",
+									"        pm.expect(jsonData.payload.ticket.amount).to.be.a('number');",
+									"        ",
+									"        // Guardar ticket code para referencia",
+									"        if (jsonData.payload.ticket.code) {",
+									"            pm.environment.set(\"ticketCode\", jsonData.payload.ticket.code);",
+									"        }",
+									"    });",
+									"} else {",
+									"    pm.test(\"Purchase failed - no stock or empty cart\", function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData.status).to.eql(\"error\");",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/carts/{{cartId}}/purchase",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"carts",
+								"{{cartId}}",
+								"purchase"
+							]
+						},
+						"description": "Finaliza la compra del carrito. Verifica stock, genera ticket, actualiza carrito con productos sin stock. Requiere autenticación de usuario."
+					},
+					"response": []
 				}
 			],
 			"description": "Tests para endpoints de carritos"
