@@ -57,7 +57,9 @@ class UserRepository {
         throw new Error("Email y contraseña son requeridos");
       }
 
-      const user = await this.getUserByEmail(email);
+      const normalizedEmail = email ? email.toLowerCase().trim() : null;
+      const user = await User.findOne({ email: normalizedEmail });
+      
       if (!user) {
         throw new Error("Credenciales inválidas");
       }
