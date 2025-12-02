@@ -1,6 +1,6 @@
 const passport = require("passport");
 
-const authenticate = passport.authenticate("current", { session: false });
+const authenticate = passport.authenticate("jwt", { session: false });
 
 const isAdmin = (req, res, next) => {
   if (!req.user) {
