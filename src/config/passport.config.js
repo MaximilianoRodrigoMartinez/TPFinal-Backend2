@@ -99,4 +99,20 @@ passport.use(
   })
 );
 
+// Estrategia "current" para obtener usuario actual (trabaja con middleware de autorización)
+passport.use(
+  "current",
+  new JwtStrategy(jwtOptions, async (payload, done) => {
+    try {
+      const user = await userService.getUserById(payload.userId);
+      if (!user) {
+        return done(null, false);
+      }
+      return done(null, user);
+    } catch (error) {
+      return done(error, false);
+    }
+  })
+);
+
 module.exports = passport;

@@ -52,7 +52,7 @@ router.post(
 
 router.get(
   "/current",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("current", { session: false }),
   sessionsController.current.bind(sessionsController)
 );
 
