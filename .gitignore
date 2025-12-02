@@ -54,4 +54,8 @@ jspm_packages/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db 
+Thumbs.db
+
+# Archivos de documentación personal
+GUIA-PRUEBAS.md
+RUTAS-POSTMAN.md 
