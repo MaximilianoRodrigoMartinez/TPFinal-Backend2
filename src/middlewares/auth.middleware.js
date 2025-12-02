@@ -32,8 +32,8 @@ const isUser = (req, res, next) => {
   return next();
 };
 
-const authenticateAdmin = [authenticate, isAdmin];
-const authenticateUser = [authenticate, isUser];
+const authenticateAdmin = [authenticateCurrent, isAdmin];
+const authenticateUser = [authenticateCurrent, isUser];
 
 module.exports = {
   authenticate,
