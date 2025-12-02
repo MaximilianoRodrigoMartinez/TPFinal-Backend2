@@ -1,0 +1,212 @@
+[
+  {
+    "title": "Laptop Gaming ASUS ROG",
+    "description": "Laptop de alto rendimiento para gaming con procesador Intel i7 y GPU RTX 3060",
+    "code": "LAP001",
+    "price": 1299.99,
+    "stock": 15,
+    "category": "Electrónicos",
+    "status": true,
+    "thumbnails": ["laptop1.jpg", "laptop2.jpg"]
+  },
+  {
+    "title": "Mouse Inalámbrico Logitech MX Master 3",
+    "description": "Mouse ergonómico inalámbrico con sensor de alta precisión",
+    "code": "MOU001",
+    "price": 99.99,
+    "stock": 50,
+    "category": "Accesorios",
+    "status": true,
+    "thumbnails": ["mouse1.jpg"]
+  },
+  {
+    "title": "Teclado Mecánico Corsair K70",
+    "description": "Teclado gaming con switches Cherry MX Red y retroiluminación RGB",
+    "code": "TEC001",
+    "price": 149.99,
+    "stock": 30,
+    "category": "Accesorios",
+    "status": true,
+    "thumbnails": ["keyboard1.jpg", "keyboard2.jpg"]
+  },
+  {
+    "title": "Monitor Samsung 27 pulgadas 4K",
+    "description": "Monitor UHD con tecnología HDR y frecuencia de 60Hz",
+    "code": "MON001",
+    "price": 399.99,
+    "stock": 25,
+    "category": "Electrónicos",
+    "status": true,
+    "thumbnails": ["monitor1.jpg"]
+  },
+  {
+    "title": "Auriculares Sony WH-1000XM4",
+    "description": "Auriculares inalámbricos con cancelación de ruido activa",
+    "code": "AUR001",
+    "price": 349.99,
+    "stock": 40,
+    "category": "Audio",
+    "status": true,
+    "thumbnails": ["headphones1.jpg", "headphones2.jpg"]
+  },
+  {
+    "title": "Webcam Logitech C920",
+    "description": "Cámara web Full HD 1080p con micrófono estéreo integrado",
+    "code": "WEB001",
+    "price": 79.99,
+    "stock": 60,
+    "category": "Accesorios",
+    "status": true,
+    "thumbnails": ["webcam1.jpg"]
+  },
+  {
+    "title": "SSD Samsung 1TB NVMe",
+    "description": "Disco sólido interno de 1TB con interfaz PCIe 4.0",
+    "code": "SSD001",
+    "price": 129.99,
+    "stock": 35,
+    "category": "Componentes",
+    "status": true,
+    "thumbnails": ["ssd1.jpg"]
+  },
+  {
+    "title": "Memoria RAM Corsair 16GB DDR4",
+    "description": "Kit de memoria RAM de 16GB (2x8GB) DDR4 3200MHz",
+    "code": "RAM001",
+    "price": 89.99,
+    "stock": 45,
+    "category": "Componentes",
+    "status": true,
+    "thumbnails": ["ram1.jpg"]
+  },
+  {
+    "title": "Placa de Video NVIDIA RTX 4070",
+    "description": "Tarjeta gráfica de alto rendimiento con 12GB GDDR6X",
+    "code": "GPU001",
+    "price": 599.99,
+    "stock": 10,
+    "category": "Componentes",
+    "status": true,
+    "thumbnails": ["gpu1.jpg", "gpu2.jpg"]
+  },
+  {
+    "title": "Fuente de Alimentación 750W 80 Plus Gold",
+    "description": "Fuente modular certificada 80 Plus Gold de 750W",
+    "code": "PSU001",
+    "price": 119.99,
+    "stock": 20,
+    "category": "Componentes",
+    "status": true,
+    "thumbnails": ["psu1.jpg"]
+  },
+  {
+    "title": "Tablet iPad Air 10.9 pulgadas",
+    "description": "Tablet Apple con chip M1, pantalla Retina y 64GB de almacenamiento",
+    "code": "TAB001",
+    "price": 599.99,
+    "stock": 18,
+    "category": "Electrónicos",
+    "status": true,
+    "thumbnails": ["tablet1.jpg", "tablet2.jpg"]
+  },
+  {
+    "title": "Smartwatch Apple Watch Series 9",
+    "description": "Reloj inteligente con GPS, monitor de frecuencia cardíaca y resistencia al agua",
+    "code": "WAT001",
+    "price": 399.99,
+    "stock": 22,
+    "category": "Wearables",
+    "status": true,
+    "thumbnails": ["watch1.jpg"]
+  },
+  {
+    "title": "Altavoz Bluetooth JBL Flip 6",
+    "description": "Altavoz portátil resistente al agua con sonido estéreo",
+    "code": "SPK001",
+    "price": 129.99,
+    "stock": 55,
+    "category": "Audio",
+    "status": true,
+    "thumbnails": ["speaker1.jpg"]
+  },
+  {
+    "title": "Cámara Canon EOS R6",
+    "description": "Cámara mirrorless full frame con sensor de 20.1MP y grabación 4K",
+    "code": "CAM001",
+    "price": 2499.99,
+    "stock": 8,
+    "category": "Fotografía",
+    "status": true,
+    "thumbnails": ["camera1.jpg", "camera2.jpg"]
+  },
+  {
+    "title": "Drone DJI Mini 3",
+    "description": "Drone compacto con cámara 4K y batería de 38 minutos",
+    "code": "DRN001",
+    "price": 759.99,
+    "stock": 12,
+    "category": "Fotografía",
+    "status": true,
+    "thumbnails": ["drone1.jpg"]
+  },
+  {
+    "title": "Router WiFi 6 ASUS AX3000",
+    "description": "Router inalámbrico de doble banda con tecnología WiFi 6",
+    "code": "ROU001",
+    "price": 179.99,
+    "stock": 28,
+    "category": "Redes",
+    "status": true,
+    "thumbnails": ["router1.jpg"]
+  },
+  {
+    "title": "Impresora HP LaserJet Pro",
+    "description": "Impresora láser monocromática con WiFi y escáner integrado",
+    "code": "PRN001",
+    "price": 249.99,
+    "stock": 15,
+    "category": "Oficina",
+    "status": true,
+    "thumbnails": ["printer1.jpg"]
+  },
+  {
+    "title": "Micrófono Blue Yeti USB",
+    "description": "Micrófono condensador USB con múltiples patrones de captación",
+    "code": "MIC001",
+    "price": 129.99,
+    "stock": 33,
+    "category": "Audio",
+    "status": true,
+    "thumbnails": ["mic1.jpg"]
+  },
+  {
+    "title": "Stream Deck Elgato",
+    "description": "Panel de control con 15 teclas programables para streaming",
+    "code": "STR001",
+    "price": 149.99,
+    "stock": 20,
+    "category": "Streaming",
+    "status": true,
+    "thumbnails": ["streamdeck1.jpg"]
+  },
+  {
+    "title": "Silla Gaming Secretlab Titan",
+    "description": "Silla ergonómica para gaming con soporte lumbar ajustable",
+    "code": "CHA001",
+    "price": 449.99,
+    "stock": 14,
+    "category": "Muebles",
+    "status": true,
+    "thumbnails": ["chair1.jpg", "chair2.jpg"]
+  },
+  {
+    "title": "Escritorio Gaming con LED",
+    "description": "Escritorio de 160cm con iluminación LED RGB y soporte para 2 monitores",
+    "code": "DES001",
+    "price": 299.99,
+    "stock": 9,
+    "category": "Muebles",
+    "status": true,
+    "thumbnails": ["desk1.jpg"]
+  }
+]

@@ -1,0 +1,92 @@
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-boxes"></i> Lista de Productos
+        </h1>
+        
+        <!-- Filtros y ordenamiento -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form method="GET" action="/products" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Categoría</label>
+                        <select name="query" class="form-select">
+                            <option value="">Todas las categorías</option>
+                            {{#each categories}}
+                            <option value="category:{{this}}" {{#if (eq ../selectedCategory this)}}selected{{/if}}>{{this}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Ordenar por Precio</label>
+                        <select name="sort" class="form-select">
+                            <option value="">Sin ordenar</option>
+                            <option value="asc" {{#if (eq sort "asc")}}selected{{/if}}>Menor a Mayor</option>
+                            <option value="desc" {{#if (eq sort "desc")}}selected{{/if}}>Mayor a Menor</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter"></i> Aplicar Filtros
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{#if payload.length}}
+            <div class="row">
+                {{#each payload}}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{title}}</h5>
+                            <p class="card-text text-muted small">{{description}}</p>
+                            <div class="mb-2">
+                                <span class="badge bg-primary">{{category}}</span>
+                            </div>
+                            <p class="card-text mb-0">
+                                <strong class="text-success fs-5">${{price}}</strong>
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="/products/{{_id}}" class="btn btn-primary w-100">
+                                <i class="fas fa-eye"></i> Ver Detalles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+
+            <!-- Paginación -->
+            <nav aria-label="Paginación de productos" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {{#if hasPrevPage}}
+                        <li class="page-item">
+                            <a class="page-link" href="{{prevLink}}">
+                                <i class="fas fa-chevron-left"></i> Anterior
+                            </a>
+                        </li>
+                    {{/if}}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">Página {{page}} de {{totalPages}}</span>
+                    </li>
+                    
+                    {{#if hasNextPage}}
+                        <li class="page-item">
+                            <a class="page-link" href="{{nextLink}}">
+                                Siguiente <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    {{/if}}
+                </ul>
+            </nav>
+        {{else}}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle"></i> No hay productos disponibles.
+            </div>
+        {{/if}}
+    </div>
+</div>

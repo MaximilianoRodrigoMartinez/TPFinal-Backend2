@@ -1,0 +1,158 @@
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item active">Carrito</li>
+            </ol>
+        </nav>
+
+        <h1 class="mb-4">
+            <i class="fas fa-shopping-cart"></i> Carrito de Compras
+        </h1>
+
+        {{#if cart.products.length}}
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Productos en el Carrito</h5>
+                        </div>
+                        <div class="card-body">
+                            {{#each cart.products}}
+                            <div class="row align-items-center mb-3 p-3 border rounded">
+                                <div class="col-md-6">
+                                    <h6 class="mb-1">{{product.title}}</h6>
+                                    <p class="text-muted small mb-1">{{product.description}}</p>
+                                    <span class="badge bg-primary">{{product.category}}</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small">Cantidad:</label>
+                                    <input type="number" class="form-control form-control-sm" 
+                                           value="{{quantity}}" min="1" 
+                                           onchange="updateQuantity('{{product._id}}', this.value)">
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <p class="mb-1"><strong class="text-success">${{product.price}}</strong></p>
+                                    <p class="text-muted small">Total: ${{multiply product.price quantity}}</p>
+                                    <button class="btn btn-danger btn-sm" onclick="removeFromCart('{{product._id}}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">Resumen</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <strong>${{calculateSubtotal cart.products}}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Productos:</span>
+                                <span>{{cart.products.length}}</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <strong>Total:</strong>
+                                <strong class="text-success fs-5">${{calculateSubtotal cart.products}}</strong>
+                            </div>
+                            
+                            <button class="btn btn-success w-100 mb-2">
+                                <i class="fas fa-credit-card"></i> Proceder al Pago
+                            </button>
+                            <button class="btn btn-outline-danger w-100" onclick="clearCart()">
+                                <i class="fas fa-trash"></i> Vaciar Carrito
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{else}}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle"></i> El carrito está vacío.
+                <a href="/products" class="alert-link">¡Agrega algunos productos!</a>
+            </div>
+        {{/if}}
+    </div>
+</div>
+
+<script>
+function updateQuantity(productId, quantity) {
+    if (quantity <= 0) {
+        if (confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
+            removeFromCart(productId);
+        } else {
+            location.reload();
+        }
+        return;
+    }
+
+    fetch(`/api/carts/{{cart._id}}/products/${productId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ quantity: parseInt(quantity) })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            location.reload();
+        } else {
+            alert("Error al actualizar la cantidad: " + data.error);
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error al actualizar la cantidad");
+        location.reload();
+    });
+}
+
+function removeFromCart(productId) {
+    fetch(`/api/carts/{{cart._id}}/products/${productId}`, {
+        method: "DELETE"
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            location.reload();
+        } else {
+            alert("Error al eliminar el producto: " + data.error);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error al eliminar el producto");
+    });
+}
+
+function clearCart() {
+    if (confirm('¿Estás seguro de que quieres vaciar el carrito?')) {
+        fetch(`/api/carts/{{cart._id}}`, {
+            method: "DELETE"
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                location.reload();
+            } else {
+                alert("Error al vaciar el carrito: " + data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error al vaciar el carrito");
+        });
+    }
+}
+</script>

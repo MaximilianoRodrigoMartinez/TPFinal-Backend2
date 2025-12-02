@@ -1,0 +1,102 @@
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/products">Productos</a></li>
+                <li class="breadcrumb-item active">{{product.title}}</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h1 class="card-title mb-3">{{product.title}}</h1>
+                        <p class="card-text text-muted">{{product.description}}</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <strong>Categoría:</strong>
+                                <span class="badge bg-primary ms-2">{{product.category}}</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Stock:</strong>
+                                <span class="badge bg-success ms-2">{{product.stock}} unidades</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <strong class="fs-4">Precio:</strong>
+                            <span class="h3 text-success ms-2">${{product.price}}</span>
+                        </div>
+
+                        {{#if product.status}}
+                            <span class="badge bg-success">Disponible</span>
+                        {{else}}
+                            <span class="badge bg-danger">No disponible</span>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mb-3">Acciones</h5>
+                        
+                        {{#if product.status}}
+                            <button class="btn btn-success btn-lg w-100 mb-3" onclick="addToCart('{{product._id}}')">
+                                <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                            </button>
+                        {{else}}
+                            <button class="btn btn-secondary btn-lg w-100 mb-3" disabled>
+                                <i class="fas fa-times"></i> No Disponible
+                            </button>
+                        {{/if}}
+
+                        <a href="/products" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-arrow-left"></i> Volver a Productos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function addToCart(productId) {
+    fetch("/api/carts", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            const cartId = data.payload._id;
+            return fetch(`/api/carts/${cartId}/product/${productId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ quantity: 1 })
+            });
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            alert("Producto agregado al carrito exitosamente");
+        } else {
+            alert("Error al agregar producto al carrito");
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error al agregar producto al carrito");
+    });
+}
+</script>

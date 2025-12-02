@@ -2,11 +2,11 @@
   "name": "tp1-backend",
   "version": "1.0.0",
   "description": "Trabajo Práctico 1 - Backend con Node.js y Express",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "migrate": "node migrate.js",
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "migrate": "node src/migrate.js",
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
   },
   "keywords": [
     "nodejs",
@@ -27,6 +27,8 @@
     "mongoose": "^8.18.3",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "cookie-parser": "^1.4.6",
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
