@@ -16,6 +16,31 @@ class TicketRepository {
         throw new Error("El monto debe ser un número mayor o igual a 0");
       }
 
+      if (!ticketData.code) {
+        let codeGenerated = false;
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        while (!codeGenerated && attempts < maxAttempts) {
+          const timestamp = Date.now().toString(36).toUpperCase();
+          const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+          const code = `TKT-${timestamp}-${randomNum}`;
+
+          const existingTicket = await Ticket.findOne({ code });
+          
+          if (!existingTicket) {
+            ticketData.code = code;
+            codeGenerated = true;
+          }
+          
+          attempts++;
+        }
+
+        if (!codeGenerated) {
+          throw new Error("No se pudo generar un código único para el ticket");
+        }
+      }
+
       const ticket = await ticketDAO.create(ticketData);
       return ticket;
     } catch (error) {

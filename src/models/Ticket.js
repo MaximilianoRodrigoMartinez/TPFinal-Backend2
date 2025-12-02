@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const ticketSchema = new mongoose.Schema({
   code: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
     trim: true,
   },
@@ -39,7 +39,8 @@ ticketSchema.pre("save", async function(next) {
       const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
       const code = `TKT-${timestamp}-${randomNum}`;
 
-      const existingTicket = await mongoose.model("Ticket").findOne({ code });
+      const TicketModel = this.constructor;
+      const existingTicket = await TicketModel.findOne({ code });
       
       if (!existingTicket) {
         this.code = code;
